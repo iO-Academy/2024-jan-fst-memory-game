@@ -1,6 +1,7 @@
 const modal = document.querySelector('#instructionModal');
 const closeBtn = document.querySelector('.close');
 const instructionsButton = document.querySelector('#instructionsButton')
+const startButton =document.querySelector('.start')
 
 closeBtn.addEventListener('click', () => {
     modal.classList.remove('open');
@@ -11,6 +12,7 @@ const openInstructionsModal = () => {
 }
 
 instructionsButton.addEventListener('click', openInstructionsModal);
+
 
 
 // max's get pattern functions:
@@ -53,8 +55,11 @@ const displayPattern = (pattern) => {
     }
 }
 
-getRandBoxes(4);
-displayPattern(pattern);
+startButton.addEventListener('click', () => {
+    getRandBoxes(4);
+    displayPattern(pattern);
+    startButton.style.visibility= 'hidden';
+})
 
 let patternCounter = 0;
 
@@ -72,6 +77,7 @@ for (let box of boxes) {
             patternCounter = 0;
             pattern = [];
             console.log('restart')
+            startButton.style.visibility= 'visible';
         }
     })
 }
