@@ -22,6 +22,8 @@ let speed = 1000;
 let pattern = [];
 let patternCounter = 0;
 let boxesActive = false;
+let gameVersion = 'MemoryDog';
+//hard game version variable =MemoryDogHard
 
 //function definitions
 const openModal = (modal) => {
@@ -95,6 +97,18 @@ const nextRound = () => {
     startGame();
 }
 
+const getData = () => {
+    fetch(`https://leaderboard.dev.io-academy.uk/scores?game=${gameVersion}`).then(response => {
+        return response.json();
+    }).then(result => {
+            let leaders = [];
+            for (let i=0;i<10;i++){
+                leaders.push(result.data.sort(function(a,b){return b.score-a.score})[i]);
+                addLeaderboardTable(leaders[i], i+1);
+            }
+        }
+    )}
+
 const addLeaderboardTable = (player, i) => {
     let tableRow = document.createElement('tr');
     let tableData = document.createElement('td');
@@ -134,7 +148,7 @@ const sendData = () => {
     fetch('https://leaderboard.dev.io-academy.uk/score',
         {
             method: 'POST',
-            body: JSON.stringify({'game': 'MemoryDog', 'name': playerName.value, 'score': roundCounter}),
+            body: JSON.stringify({'game': gameVersion, 'name': playerName.value, 'score': roundCounter}),
             headers: {
                 'content-type': 'application/json'
             }
