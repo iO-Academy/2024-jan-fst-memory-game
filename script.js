@@ -15,6 +15,10 @@ const leaderboardButtons = document.querySelectorAll('.leaderboardButton');
 const leaderboardButton = document.querySelector('.leaderboardButton');
 const leaderboardTable = document.querySelector('.leaderboardTable tbody');
 const themeMusic = document.querySelector('.music');
+const gameOptionsModal = document.querySelector('#gameOptionsModal');
+const normalModeButton = document.querySelector('.normalModeButton');
+const hardModeButton = document.querySelector('.hardModeButton');
+const gameOptionsClose = document.querySelector('.gameOptionsClose');
 
 let roundCounter = 0;
 let patternLength = 4;
@@ -22,6 +26,7 @@ let speed = 1000;
 let pattern = [];
 let patternCounter = 0;
 let boxesActive = false;
+let gameVersion = 'normal';
 
 //function definitions
 const openModal = (modal) => {
@@ -74,6 +79,7 @@ const displayPattern = (pattern, speed) => {
 
 const startGame = () => {
     boxesActive = false
+    console.log(`${gameVersion}`);
     themeMusic.play();
     getRandBoxes(patternLength);
     themeMusic.play();
@@ -156,6 +162,10 @@ instructionCloseBtn.addEventListener('click', () => {
     closeModal(instructionModal);
 })
 
+gameOptionsClose.addEventListener('click', () => {
+    closeModal(gameOptionsModal);
+})
+
 gameOverCloseBtns.forEach(button => {
     button.addEventListener('click', () => {
         closeModal(instructionModal);
@@ -168,9 +178,6 @@ playAgainButtons.forEach(button => {
     button.addEventListener('click', () => {
         closeModal(gameOverModal);
         closeModal(leaderboardModal);
-        startButton.disabled = true;
-        resetPattern();
-        startGame();
     })
 })
 
@@ -183,11 +190,29 @@ leaderboardButtons.forEach(button => {
     })
 })
 
+// startButton.addEventListener('click', () => {
+//     startButton.disabled = true;
+//     resetPattern();
+//     startGame();
+// });
 startButton.addEventListener('click', () => {
+    openModal(gameOptionsModal)
+})
+
+normalModeButton.addEventListener('click', () => {
+    closeModal(gameOptionsModal);
     startButton.disabled = true;
     resetPattern();
     startGame();
-});
+})
+
+hardModeButton.addEventListener('click', () => {
+    gameVersion = 'hard';
+    closeModal(gameOptionsModal);
+    startButton.disabled = true;
+    resetPattern();
+    startGame();
+})
 
 boxes.forEach(box => {
     box.addEventListener('click', () => {
@@ -197,7 +222,7 @@ boxes.forEach(box => {
                 lightDiv(box, "pawImg");
             } else {
                 gameOver();
-                startButton.addEventListener('click', startGame);
+                // startButton.addEventListener('click', startGame);
             }
             if (patternCounter === pattern.length && patternCounter !== 0) {
                 setTimeout(nextRound, 500);
