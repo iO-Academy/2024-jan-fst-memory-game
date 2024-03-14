@@ -254,7 +254,6 @@ boxes.forEach(box => {
                 lightDiv(box, "pawImg");
             } else {
                 gameOver();
-                // startButton.addEventListener('click', startGame);
             }
             if (patternCounter === pattern.length && patternCounter !== 0) {
                 setTimeout(nextRound, 500);
