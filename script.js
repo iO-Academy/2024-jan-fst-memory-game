@@ -15,6 +15,10 @@ const leaderboardButtons = document.querySelectorAll('.leaderboardButton');
 const leaderboardButton = document.querySelector('.leaderboardButton');
 const leaderboardTable = document.querySelector('.leaderboardTable tbody');
 const themeMusic = document.querySelector('.music');
+const gameOptionsModal = document.querySelector('#gameOptionsModal');
+const normalModeButton = document.querySelector('.normalModeButton');
+const hardModeButton = document.querySelector('.hardModeButton');
+const gameOptionsClose = document.querySelector('.gameOptionsClose');
 
 let roundCounter = 0;
 let patternLength = 4;
@@ -22,8 +26,9 @@ let speed = 1000;
 let pattern = [];
 let patternCounter = 0;
 let boxesActive = false;
+let capybaras = [];
+let capybaraAmount = 1;
 let gameVersion = 'MemoryDog';
-//hard game version variable =MemoryDogHard
 
 //function definitions
 const openModal = (modal) => {
@@ -46,11 +51,18 @@ const resetPattern = () => {
     speed = 1000;
     patternLength = 4;
     levelNumber.textContent = 'Level 1';
+    capybaraAmount = 1;
 }
 
 const  getRandBoxes = (patternLength) => {
     for (let i = 0; i < patternLength; i++) {
         pattern.push(Math.floor(Math.random() * 9));
+    }
+}
+
+const getCapybara = (amount) => {
+    for (let i = 0; i < amount; i ++) {
+        capybaras.push(9 + Math.floor(Math.random() * 9))
     }
 }
 
@@ -62,20 +74,46 @@ const lightDiv = (div, background) => {
     }, speed * speedMultDisappear);
 }
 
-const displayPattern = (pattern, speed) => {
-    for (let i = 0; i < pattern.length; i++) {
-        let currentBox = boxes[pattern[i]];
-        setTimeout(() => {
-            lightDiv(currentBox, 'dogImg');
-        }, speed * (i+1));
+const displayPattern = (pattern, speed, capybaraAmount) => {
+    getCapybara(capybaraAmount);
+    let displayAmount = []
+    pattern.forEach(item => {
+        displayAmount.push(item)
+    })
+    capybaras.forEach(item => {
+        let randomIndex = Math.floor(Math.random() * (displayAmount.length));
+        displayAmount.splice(randomIndex, 0, item)
+    })
+    for (let i = 0; i < displayAmount.length; i++) {
+        let capybaraFound = 0;
+        if (displayAmount[i] <= 8){
+            if (i >= pattern.length) {
+                let currentBox = boxes[displayAmount[i - capybaraFound]];
+                setTimeout(() => {
+                    lightDiv(currentBox, 'dogImg');
+                }, speed * (i+1));
+            } else {
+                let currentBox = boxes[displayAmount[i]];
+                setTimeout(() => {
+                    lightDiv(currentBox, 'dogImg');
+                }, speed * (i+1));
+                capybaraFound ++
+            }
+        } else {
+            let fakeBox = boxes[displayAmount[i]%9];
+            setTimeout(() => {
+                lightDiv(fakeBox, 'capybara');
+            }, speed * (i+1));
+        }
     }
     setTimeout(() => {
         boxesActive = true
-    }, speed * (patternLength))
+    }, speed * (displayAmount.length))
 }
 
 const startGame = () => {
     boxesActive = false
+    console.log(`${gameVersion}`);
     themeMusic.play();
     getRandBoxes(patternLength);
     themeMusic.play();
@@ -83,7 +121,7 @@ const startGame = () => {
     if (roundCounter % 5 === 0 && roundCounter !== 0) {
         speed *= speedMult;
     }
-    displayPattern(pattern, speed);
+    displayPattern(pattern, speed, capybaraAmount);
 }
 
 const nextRound = () => {
@@ -91,8 +129,10 @@ const nextRound = () => {
     pattern = [];
     roundCounter++;
     levelNumber.textContent = 'Level ' + (roundCounter+1);
+    capybaras = [];
     if (roundCounter % 3 === 0){
         patternLength++;
+        capybaraAmount++;
     }
     startGame();
 }
@@ -159,6 +199,10 @@ instructionCloseBtn.addEventListener('click', () => {
     closeModal(instructionModal);
 })
 
+gameOptionsClose.addEventListener('click', () => {
+    closeModal(gameOptionsModal);
+})
+
 gameOverCloseBtns.forEach(button => {
     button.addEventListener('click', () => {
         closeModal(instructionModal);
@@ -171,9 +215,6 @@ playAgainButtons.forEach(button => {
     button.addEventListener('click', () => {
         closeModal(gameOverModal);
         closeModal(leaderboardModal);
-        startButton.disabled = true;
-        resetPattern();
-        startGame();
     })
 })
 
@@ -187,10 +228,23 @@ leaderboardButtons.forEach(button => {
 })
 
 startButton.addEventListener('click', () => {
+    openModal(gameOptionsModal)
+})
+
+normalModeButton.addEventListener('click', () => {
+    closeModal(gameOptionsModal);
     startButton.disabled = true;
     resetPattern();
     startGame();
-});
+})
+
+hardModeButton.addEventListener('click', () => {
+    gameVersion = 'MemoryDogHard';
+    closeModal(gameOptionsModal);
+    startButton.disabled = true;
+    resetPattern();
+    startGame();
+})
 
 boxes.forEach(box => {
     box.addEventListener('click', () => {

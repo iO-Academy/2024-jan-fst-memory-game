@@ -70,6 +70,10 @@
     background-image: url('blackPawPrintTransparentBackground.png');
 }
 
+.capybara {
+    background-image: url('capybaraimg.jpg');
+}
+
 .instructionText {
     text-align: center;
     display: flex;
@@ -106,6 +110,13 @@
 }
 
 .gameOverBtns {
+    display: flex;
+    justify-content: space-evenly;
+    padding: 0 5rem;
+    align-items: center;
+}
+
+.gameOptionsButtons{
     display: flex;
     justify-content: space-evenly;
     padding: 0 5rem;
