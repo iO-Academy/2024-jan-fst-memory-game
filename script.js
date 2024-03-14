@@ -46,14 +46,12 @@ const resetPattern = () => {
     speed = 1000;
     patternLength = 4;
     levelNumber.textContent = 'Level 1';
-    console.log('reset pattern');
 }
 
 const  getRandBoxes = (patternLength) => {
     for (let i = 0; i < patternLength; i++) {
         pattern.push(Math.floor(Math.random() * 9));
     }
-    console.log('get rand boxes');
 }
 
 const lightDiv = (div, background) => {
@@ -86,7 +84,6 @@ const startGame = () => {
         speed *= speedMult;
     }
     displayPattern(pattern, speed);
-    console.log('start game');
 }
 
 const nextRound = () => {
@@ -97,7 +94,6 @@ const nextRound = () => {
     if (roundCounter % 3 === 0){
         patternLength++;
     }
-    console.log('next round')
     startGame();
 }
 
@@ -193,7 +189,6 @@ leaderboardButtons.forEach(button => {
 startButton.addEventListener('click', () => {
     startButton.disabled = true;
     resetPattern();
-    console.log('start button event')
     startGame();
 });
 
