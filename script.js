@@ -24,6 +24,8 @@ let patternCounter = 0;
 let boxesActive = false;
 let capybaras = [];
 let capybaraAmount = 1;
+let gameVersion = 'MemoryDog';
+//hard game version variable =MemoryDogHard
 
 //function definitions
 const openModal = (modal) => {
@@ -71,17 +73,14 @@ const lightDiv = (div, background) => {
 
 const displayPattern = (pattern, speed, capybaraAmount) => {
     getCapybara(capybaraAmount);
-    console.log(capybaras);
     let displayAmount = []
     pattern.forEach(item => {
         displayAmount.push(item)
     })
-    console.log(displayAmount);
     capybaras.forEach(item => {
         let randomIndex = Math.floor(Math.random() * (displayAmount.length));
         displayAmount.splice(randomIndex, 0, item)
     })
-    console.log(displayAmount);
     for (let i = 0; i < displayAmount.length; i++) {
         let capybaraFound = 0;
         if (displayAmount[i] <= 8){
@@ -135,7 +134,7 @@ const nextRound = () => {
 }
 
 const getData = () => {
-    fetch('https://leaderboard.dev.io-academy.uk/scores?game=MemoryDog').then(response => {
+    fetch(`https://leaderboard.dev.io-academy.uk/scores?game=${gameVersion}`).then(response => {
         return response.json();
     }).then(result => {
             let leaders = [];
@@ -169,12 +168,23 @@ const addLeaderboardTable = (player, i) => {
     tableRow.appendChild(tableData).textContent = player.name;
     tableRow.appendChild(tableDataTwo).textContent = player.score;
 }
+const getData = () => {
+    fetch('https://leaderboard.dev.io-academy.uk/scores?game=MemoryDog').then(response => {
+        return response.json();
+    }).then(result => {
+            let leaders = [];
+            for (let i=0;i<10;i++){
+                leaders.push(result.data.sort(function(a,b){return b.score-a.score})[i]);
+                addLeaderboardTable(leaders[i], i+1);
+            }
+        }
+    )}
 
 const sendData = () => {
     fetch('https://leaderboard.dev.io-academy.uk/score',
         {
             method: 'POST',
-            body: JSON.stringify({'game': 'MemoryDog', 'name': playerName.value, 'score': roundCounter}),
+            body: JSON.stringify({'game': gameVersion, 'name': playerName.value, 'score': roundCounter}),
             headers: {
                 'content-type': 'application/json'
             }
