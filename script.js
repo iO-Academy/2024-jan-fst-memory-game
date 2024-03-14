@@ -104,20 +104,9 @@ const displayPattern = (pattern, speed, capybaraAmount) => {
             }, speed * (i+1));
         }
     }
-
-
-
-
-
-    // for (let i = 0; i < pattern.length; i++) {
-    //     let currentBox = boxes[pattern[i]];
-    //     setTimeout(() => {
-    //         lightDiv(currentBox, 'dogImg');
-    //     }, speed * (i+1));
-    // }
     setTimeout(() => {
         boxesActive = true
-    }, speed * (patternLength))
+    }, speed * (displayAmount.length))
 }
 
 const startGame = () => {
