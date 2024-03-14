@@ -116,6 +116,13 @@
     align-items: center;
 }
 
+.gameOptionsButtons{
+    display: flex;
+    justify-content: space-evenly;
+    padding: 0 5rem;
+    align-items: center;
+}
+
 
 body{
     background-color: #88AD63;
