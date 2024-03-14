@@ -22,6 +22,8 @@ let speed = 1000;
 let pattern = [];
 let patternCounter = 0;
 let boxesActive = false;
+let capybaras = [];
+let capybaraAmount = 1;
 
 //function definitions
 const openModal = (modal) => {
@@ -44,11 +46,18 @@ const resetPattern = () => {
     speed = 1000;
     patternLength = 4;
     levelNumber.textContent = 'Level 1';
+    capybaraAmount = 1;
 }
 
 const  getRandBoxes = (patternLength) => {
     for (let i = 0; i < patternLength; i++) {
         pattern.push(Math.floor(Math.random() * 9));
+    }
+}
+
+const getCapybara = (amount) => {
+    for (let i = 0; i < amount; i ++) {
+        capybaras.push(Math.floor(Math.random() * -9))
     }
 }
 
@@ -60,13 +69,52 @@ const lightDiv = (div, background) => {
     }, speed * speedMultDisappear);
 }
 
-const displayPattern = (pattern, speed) => {
-    for (let i = 0; i < pattern.length; i++) {
-        let currentBox = boxes[pattern[i]];
-        setTimeout(() => {
-            lightDiv(currentBox, 'dogImg');
-        }, speed * (i+1));
+const displayPattern = (pattern, speed, capybaraAmount) => {
+    getCapybara(capybaraAmount);
+    console.log(capybaras);
+    let displayAmount = []
+    pattern.forEach(item => {
+        displayAmount.push(item)
+    })
+    console.log(displayAmount);
+    capybaras.forEach(item => {
+        let randomIndex = Math.floor(Math.random() * (displayAmount.length - 1));
+        displayAmount.splice(displayAmount[randomIndex], 0, item)
+    })
+    console.log(displayAmount);
+    for (let i = 0; i < displayAmount.length; i++) {
+        let herringsFound = 0;
+        if (displayAmount[i] >= 0){
+            if (i >= pattern.length) {
+                let currentBox = boxes[displayAmount[i - herringsFound]];
+                setTimeout(() => {
+                    lightDiv(currentBox, 'dogImg');
+                }, speed * (i+1));
+            } else {
+                let currentBox = boxes[displayAmount[i]];
+                setTimeout(() => {
+                    lightDiv(currentBox, 'dogImg');
+                }, speed * (i+1));
+                herringsFound ++
+            }
+        } else {
+            let fakeBox = boxes[Math.abs(displayAmount[i])];
+            setTimeout(() => {
+                lightDiv(fakeBox, 'capybara');
+            }, speed * (i+1));
+        }
     }
+
+
+
+
+
+    // for (let i = 0; i < pattern.length; i++) {
+    //     let currentBox = boxes[pattern[i]];
+    //     setTimeout(() => {
+    //         lightDiv(currentBox, 'dogImg');
+    //     }, speed * (i+1));
+    // }
     setTimeout(() => {
         boxesActive = true
     }, speed * (patternLength))
@@ -81,7 +129,7 @@ const startGame = () => {
     if (roundCounter % 5 === 0 && roundCounter !== 0) {
         speed *= speedMult;
     }
-    displayPattern(pattern, speed);
+    displayPattern(pattern, speed, capybaraAmount);
 }
 
 const nextRound = () => {
@@ -89,8 +137,10 @@ const nextRound = () => {
     pattern = [];
     roundCounter++;
     levelNumber.textContent = 'Level ' + (roundCounter+1);
+    capybaras = [];
     if (roundCounter % 3 === 0){
         patternLength++;
+        capybaraAmount++;
     }
     startGame();
 }
