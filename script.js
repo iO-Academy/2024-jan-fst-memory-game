@@ -78,15 +78,15 @@ const displayPattern = (pattern, speed, capybaraAmount) => {
     })
     console.log(displayAmount);
     capybaras.forEach(item => {
-        let randomIndex = Math.floor(Math.random() * (displayAmount.length - 1));
-        displayAmount.splice(displayAmount[randomIndex], 0, item)
+        let randomIndex = Math.floor(Math.random() * (displayAmount.length));
+        displayAmount.splice(randomIndex, 0, item)
     })
     console.log(displayAmount);
     for (let i = 0; i < displayAmount.length; i++) {
-        let herringsFound = 0;
+        let capybaraFound = 0;
         if (displayAmount[i] <= 8){
             if (i >= pattern.length) {
-                let currentBox = boxes[displayAmount[i - herringsFound]];
+                let currentBox = boxes[displayAmount[i - capybaraFound]];
                 setTimeout(() => {
                     lightDiv(currentBox, 'dogImg');
                 }, speed * (i+1));
@@ -95,7 +95,7 @@ const displayPattern = (pattern, speed, capybaraAmount) => {
                 setTimeout(() => {
                     lightDiv(currentBox, 'dogImg');
                 }, speed * (i+1));
-                herringsFound ++
+                capybaraFound ++
             }
         } else {
             let fakeBox = boxes[displayAmount[i]%9];
