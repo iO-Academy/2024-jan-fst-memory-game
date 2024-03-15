@@ -15,6 +15,11 @@ const leaderboardButtons = document.querySelectorAll('.leaderboardButton');
 const leaderboardButton = document.querySelector('.leaderboardButton');
 const leaderboardTable = document.querySelector('.leaderboardTable tbody');
 const themeMusic = document.querySelector('.music');
+const gameOptionsModal = document.querySelector('#gameOptionsModal');
+const normalModeButton = document.querySelector('.normalModeButton');
+const hardModeButton = document.querySelector('.hardModeButton');
+const gameOptionsClose = document.querySelector('.gameOptionsClose');
+const leaderboardTitle = document.querySelector('.leaderboardTitle');
 
 let roundCounter = 0;
 let patternLength = 4;
@@ -22,6 +27,9 @@ let speed = 1000;
 let pattern = [];
 let patternCounter = 0;
 let boxesActive = false;
+let capybaras = [];
+let capybaraAmount = 0;
+let gameVersion = 'MemoryDog';
 
 //function definitions
 const openModal = (modal) => {
@@ -45,12 +53,22 @@ const resetPattern = () => {
     patternLength = 4;
     patternCounter = 0;
     levelNumber.textContent = 'Level 1';
+    capybaraAmount = 0;
+    patternCounter = 0;
+    capybaras = [];
 }
 
 const  getRandBoxes = (patternLength) => {
     for (let i = 0; i < patternLength; i++) {
         pattern.push(Math.floor(Math.random() * 9));
     }
+}
+
+const getCapybara = (amount) => {
+    let capybaraArray = [];
+    for (let i = 0; i < amount; i ++) {
+        capybaraArray.push(9 + Math.floor(Math.random() * 9));
+    } return capybaraArray;
 }
 
 const lightDiv = (div, background) => {
@@ -61,20 +79,40 @@ const lightDiv = (div, background) => {
     }, speed * speedMultDisappear);
 }
 
-const displayPattern = (pattern, speed) => {
-    for (let i = 0; i < pattern.length; i++) {
-        let currentBox = boxes[pattern[i]];
-        setTimeout(() => {
-            lightDiv(currentBox, 'dogImg');
-        }, speed * (i+1));
+const createDisplayArray = (dogsArray, capybaraArray) => {
+    let displayAmount = [];
+    dogsArray.forEach(item => {
+        displayAmount.push(item);
+    })
+    capybaraArray.forEach(item => {
+        let randomIndex = Math.floor(Math.random() * (displayAmount.length));
+        displayAmount.splice(randomIndex, 0, item);
+    })
+    return displayAmount;
+}
+
+const displayPattern = (pattern, speed, capybaraAmount) => {
+    let capybaraArray = getCapybara(capybaraAmount);
+    let displayAmount = createDisplayArray(pattern, capybaraArray);
+    for (let i = 0; i < displayAmount.length; i++) {
+        if (displayAmount[i] <= 8){
+                setTimeout(() => {
+                    lightDiv(boxes[displayAmount[i]], 'dogImg');
+                }, speed * (i+1));
+        } else {
+            setTimeout(() => {
+                lightDiv(boxes[displayAmount[i]%9], 'capybara');
+            }, speed * (i+1));
+        }
     }
     setTimeout(() => {
         boxesActive = true
-    }, speed * (patternLength))
+    }, speed * (displayAmount.length))
 }
 
 const startGame = () => {
     boxesActive = false
+    console.log(`${gameVersion}`);
     themeMusic.play();
     getRandBoxes(patternLength);
     themeMusic.play();
@@ -82,7 +120,7 @@ const startGame = () => {
     if (roundCounter % 5 === 0 && roundCounter !== 0) {
         speed *= speedMult;
     }
-    displayPattern(pattern, speed);
+    displayPattern(pattern, speed, capybaraAmount);
 }
 
 const nextRound = () => {
@@ -90,13 +128,34 @@ const nextRound = () => {
     pattern = [];
     roundCounter++;
     levelNumber.textContent = 'Level ' + (roundCounter+1);
+    capybaras = [];
     if (roundCounter % 3 === 0){
         patternLength++;
+        if (gameVersion === 'MemoryDogHard'){
+            capybaraAmount++;
+        }
     }
     startGame();
 }
 
+const getData = () => {
+    fetch(`https://leaderboard.dev.io-academy.uk/scores?game=${gameVersion}`).then(response => {
+        return response.json();
+    }).then(result => {
+            let leaders = [];
+            for (let i=0;i<10;i++){
+                leaders.push(result.data.sort(function(a,b){return b.score-a.score})[i]);
+                addLeaderboardTable(leaders[i], i+1);
+            }
+        }
+    )}
+
 const addLeaderboardTable = (player, i) => {
+    if (gameVersion === 'MemoryDogHard') {
+        leaderboardTitle.innerText = 'Hard Leaderboard';
+    } else {
+        leaderboardTitle.innerText = 'Easy Leaderboard';
+    }
     let tableRow = document.createElement('tr');
     let tableData = document.createElement('td');
     let tableDataTwo = document.createElement('td');
@@ -119,23 +178,12 @@ const addLeaderboardTable = (player, i) => {
     tableRow.appendChild(tableData).textContent = player.name;
     tableRow.appendChild(tableDataTwo).textContent = player.score;
 }
-const getData = () => {
-    fetch('https://leaderboard.dev.io-academy.uk/scores?game=MemoryDog').then(response => {
-        return response.json();
-    }).then(result => {
-            let leaders = [];
-            for (let i=0;i<10;i++){
-                leaders.push(result.data.sort(function(a,b){return b.score-a.score})[i]);
-                addLeaderboardTable(leaders[i], i+1);
-            }
-        }
-    )}
 
 const sendData = () => {
     fetch('https://leaderboard.dev.io-academy.uk/score',
         {
             method: 'POST',
-            body: JSON.stringify({'game': 'MemoryDog', 'name': playerName.value, 'score': roundCounter}),
+            body: JSON.stringify({'game': gameVersion, 'name': playerName.value, 'score': roundCounter}),
             headers: {
                 'content-type': 'application/json'
             }
@@ -157,6 +205,10 @@ instructionCloseBtn.addEventListener('click', () => {
     closeModal(instructionModal);
 })
 
+gameOptionsClose.addEventListener('click', () => {
+    closeModal(gameOptionsModal);
+})
+
 gameOverCloseBtns.forEach(button => {
     button.addEventListener('click', () => {
         closeModal(instructionModal);
@@ -169,9 +221,6 @@ playAgainButtons.forEach(button => {
     button.addEventListener('click', () => {
         closeModal(gameOverModal);
         closeModal(leaderboardModal);
-        startButton.disabled = true;
-        resetPattern();
-        startGame();
     })
 })
 
@@ -185,10 +234,24 @@ leaderboardButtons.forEach(button => {
 })
 
 startButton.addEventListener('click', () => {
+    openModal(gameOptionsModal)
+})
+
+normalModeButton.addEventListener('click', () => {
+    gameVersion = 'MemoryDog';
+    closeModal(gameOptionsModal);
     startButton.disabled = true;
     resetPattern();
     startGame();
-});
+})
+
+hardModeButton.addEventListener('click', () => {
+    gameVersion = 'MemoryDogHard';
+    closeModal(gameOptionsModal);
+    startButton.disabled = true;
+    resetPattern();
+    startGame();
+})
 
 boxes.forEach(box => {
     box.addEventListener('click', () => {
@@ -198,7 +261,6 @@ boxes.forEach(box => {
                 lightDiv(box, "pawImg");
             } else {
                 gameOver();
-                startButton.addEventListener('click', startGame);
             }
             if (patternCounter === pattern.length && patternCounter !== 0) {
                 setTimeout(nextRound, 500);
@@ -207,5 +269,8 @@ boxes.forEach(box => {
     })
     })
 
-submitName.addEventListener('click', sendData);
+submitName.addEventListener('click', () => {
+    console.log('submit button clicked');
+    sendData();
+});
 
