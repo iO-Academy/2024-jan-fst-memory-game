@@ -27,7 +27,7 @@ let pattern = [];
 let patternCounter = 0;
 let boxesActive = false;
 let capybaras = [];
-let capybaraAmount = 1;
+let capybaraAmount = 0;
 let gameVersion = 'MemoryDog';
 
 //function definitions
@@ -51,7 +51,9 @@ const resetPattern = () => {
     speed = 1000;
     patternLength = 4;
     levelNumber.textContent = 'Level 1';
-    capybaraAmount = 1;
+    capybaraAmount = 0;
+    patternCounter = 0;
+    capybaras = [];
 }
 
 const  getRandBoxes = (patternLength) => {
@@ -61,9 +63,10 @@ const  getRandBoxes = (patternLength) => {
 }
 
 const getCapybara = (amount) => {
+    let capybaraArray = [];
     for (let i = 0; i < amount; i ++) {
-        capybaras.push(9 + Math.floor(Math.random() * 9))
-    }
+        capybaraArray.push(9 + Math.floor(Math.random() * 9));
+    } return capybaraArray;
 }
 
 const lightDiv = (div, background) => {
@@ -74,35 +77,29 @@ const lightDiv = (div, background) => {
     }, speed * speedMultDisappear);
 }
 
-const displayPattern = (pattern, speed, capybaraAmount) => {
-    getCapybara(capybaraAmount);
-    let displayAmount = []
-    pattern.forEach(item => {
-        displayAmount.push(item)
+const createDisplayArray = (dogsArray, capybaraArray) => {
+    let displayAmount = [];
+    dogsArray.forEach(item => {
+        displayAmount.push(item);
     })
-    capybaras.forEach(item => {
+    capybaraArray.forEach(item => {
         let randomIndex = Math.floor(Math.random() * (displayAmount.length));
-        displayAmount.splice(randomIndex, 0, item)
+        displayAmount.splice(randomIndex, 0, item);
     })
+    return displayAmount;
+}
+
+const displayPattern = (pattern, speed, capybaraAmount) => {
+    let capybaraArray = getCapybara(capybaraAmount);
+    let displayAmount = createDisplayArray(pattern, capybaraArray);
     for (let i = 0; i < displayAmount.length; i++) {
-        let capybaraFound = 0;
         if (displayAmount[i] <= 8){
-            if (i >= pattern.length) {
-                let currentBox = boxes[displayAmount[i - capybaraFound]];
                 setTimeout(() => {
-                    lightDiv(currentBox, 'dogImg');
+                    lightDiv(boxes[displayAmount[i]], 'dogImg');
                 }, speed * (i+1));
-            } else {
-                let currentBox = boxes[displayAmount[i]];
-                setTimeout(() => {
-                    lightDiv(currentBox, 'dogImg');
-                }, speed * (i+1));
-                capybaraFound ++
-            }
         } else {
-            let fakeBox = boxes[displayAmount[i]%9];
             setTimeout(() => {
-                lightDiv(fakeBox, 'capybara');
+                lightDiv(boxes[displayAmount[i]%9], 'capybara');
             }, speed * (i+1));
         }
     }
@@ -132,7 +129,9 @@ const nextRound = () => {
     capybaras = [];
     if (roundCounter % 3 === 0){
         patternLength++;
-        capybaraAmount++;
+        if (gameVersion === 'MemoryDogHard'){
+            capybaraAmount++;
+        }
     }
     startGame();
 }
@@ -232,6 +231,7 @@ startButton.addEventListener('click', () => {
 })
 
 normalModeButton.addEventListener('click', () => {
+    gameVersion = 'MemoryDog';
     closeModal(gameOptionsModal);
     startButton.disabled = true;
     resetPattern();
@@ -262,5 +262,8 @@ boxes.forEach(box => {
     })
     })
 
-submitName.addEventListener('click', sendData);
+submitName.addEventListener('click', () => {
+    console.log('submit button clicked');
+    sendData();
+});
 
