@@ -93,14 +93,12 @@ const displayPattern = (pattern, speed, capybaraAmount) => {
     let displayAmount = createDisplayArray(pattern, capybaraArray);
     for (let i = 0; i < displayAmount.length; i++) {
         if (displayAmount[i] <= 8){
-                let currentBox = boxes[displayAmount[i]];
                 setTimeout(() => {
-                    lightDiv(currentBox, 'dogImg');
+                    lightDiv(boxes[displayAmount[i]], 'dogImg');
                 }, speed * (i+1));
         } else {
-            let fakeBox = boxes[displayAmount[i]%9];
             setTimeout(() => {
-                lightDiv(fakeBox, 'capybara');
+                lightDiv(boxes[displayAmount[i]%9], 'capybara');
             }, speed * (i+1));
         }
     }
