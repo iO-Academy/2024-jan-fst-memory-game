@@ -231,6 +231,7 @@ startButton.addEventListener('click', () => {
 })
 
 normalModeButton.addEventListener('click', () => {
+    gameVersion = 'MemoryDog';
     closeModal(gameOptionsModal);
     startButton.disabled = true;
     resetPattern();
