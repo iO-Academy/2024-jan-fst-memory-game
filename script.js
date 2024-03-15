@@ -19,6 +19,7 @@ const gameOptionsModal = document.querySelector('#gameOptionsModal');
 const normalModeButton = document.querySelector('.normalModeButton');
 const hardModeButton = document.querySelector('.hardModeButton');
 const gameOptionsClose = document.querySelector('.gameOptionsClose');
+const leaderboardTitle = document.querySelector('.leaderboardTitle');
 
 let roundCounter = 0;
 let patternLength = 4;
@@ -149,6 +150,11 @@ const getData = () => {
     )}
 
 const addLeaderboardTable = (player, i) => {
+    if (gameVersion === 'MemoryDogHard') {
+        leaderboardTitle.innerText = 'Hard Leaderboard';
+    } else {
+        leaderboardTitle.innerText = 'Easy Leaderboard';
+    }
     let tableRow = document.createElement('tr');
     let tableData = document.createElement('td');
     let tableDataTwo = document.createElement('td');
