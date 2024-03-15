@@ -52,6 +52,7 @@ const resetPattern = () => {
     patternLength = 4;
     levelNumber.textContent = 'Level 1';
     capybaraAmount = 0;
+    patternCounter = 0;
     capybaras = [];
 }
 
